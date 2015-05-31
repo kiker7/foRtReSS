@@ -2,11 +2,13 @@
 
 # Imports
 from wsgiref.simple_server import make_server
+import ssl
 
 # Global variables
 SERVER_IP_ADDRESS = '127.0.0.1'
 SERVER_PORT = 8000
 RESOURCES_LOCATION = 'resources'
+HOME_PAGE = 'mainpage.html'
 EXTENSIONS = {
     '.css': 'text/css',
     '.gif': 'image/gif',
@@ -35,18 +37,18 @@ class Application:
                 content_type = 'text/plain'
         elif extension in EXTENSIONS:
             content_type = EXTENSIONS[extension]
-        response_headers = [('Content-type', content_type)]
-        
-        response_body = self.open_file(path)
+        response_headers = [('Content-type', content_type), ('X-Forwarded-Proto', 'https')]
+
+        response_body = self.openFile(path)
         
         status = '200 OK'
         start_response(status, response_headers)
         return response_body
     
-    def open_file(self, path):
+    def openFile(self, path):
         path = RESOURCES_LOCATION + path
         if path == "resources/":
-            path += 'mainpage.html'
+            path += HOME_PAGE
         file = open(path, "rb")
         content = file.read()
         file.close()
@@ -55,4 +57,5 @@ class Application:
 if __name__ == '__main__':
     application = Application()
     httpd = make_server(SERVER_IP_ADDRESS, SERVER_PORT, application)
+    httpd.socket = ssl.wrap_socket(httpd.socket, 'certificate/server.key', 'certificate/server.crt', server_side=True)
     httpd.serve_forever()
