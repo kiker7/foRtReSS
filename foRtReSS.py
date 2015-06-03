@@ -2,6 +2,8 @@ import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from contextlib import closing
 
+
+
 DATABASE = 'database/foRtReSS.db'
 DEBUG = True
 SECRET_KEY = 'development.key'
@@ -90,4 +92,4 @@ def logout():
     return redirect(url_for('show_entries'))
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1',port=8000)
+    app.run(host='127.0.0.1',port=8000,debug = False/True,ssl_context=('certificates/server.crt', 'certificates/server.key'))
