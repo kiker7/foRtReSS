@@ -1,0 +1,24 @@
+<html>
+<head>
+<link rel=stylesheet type=text/css
+	href="{{ url_for('static', filename='styles/home.css') }}">
+<title>foRtReSS - Home</title>
+</head>
+<body>
+	<div id=topbar>
+		<p id="logo">
+			<a href="{{ url_for('home') }}">foRtReSS</a>
+		</p>
+		<ul id="menu">
+			{% if not session.logged_in %}
+			<li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+			<li><a href="{{ url_for('signin') }}">Sign In</a></li> {% else %}
+			<li><a href="{{ url_for('signout') }}">Sign Out</a></li>
+			<li><a href="{{ url_for('profile') }}">Profile</a></li> {% if session.logged_user ==
+			"admin"%}
+			<li><a href="#">Manage Database</a></li> {% endif %} {% endif %}
+		</ul>
+	</div>
+	{% block body %}{% endblock %}
+</body>
+</html>

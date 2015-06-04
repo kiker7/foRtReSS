@@ -1,0 +1,27 @@
+#page {
+	width: 700px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 50px;
+}
+
+#avatar {
+	width: 250px;
+	height: 300px;
+	background-color: grey;
+	float: left;
+}
+
+#info {
+	width: 430px;
+	height: 300px;
+	float: left;
+	background-color: white;
+	padding-left: 20px;
+	padding-top: 10px;
+}
+
+#info p {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}

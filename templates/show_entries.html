@@ -1,6 +1,6 @@
-{% extends "layout.html" %}
+{% extends "home.html" %}
 {% block body %}
-  {% if session.logged_in %}
+{% if session.logged_in %}
     <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
       <dl>
         <dt>Title:
@@ -10,7 +10,7 @@
         <dd><input type=submit value=Share>
       </dl>
     </form>
-  {% endif %}
+{% endif %}
   <ul class=entries>
   {% for entry in entries %}
     <li><h2>{{ entry.title }}</h2>{{ entry.text|safe }}
