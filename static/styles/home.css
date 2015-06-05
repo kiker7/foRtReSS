@@ -27,6 +27,10 @@ body {
 	line-height: 45px;
 	box-shadow: 0px 3px 3px #404040;
 	background-color: #ffffff;
+	position: fixed;
+	top: 0px;
+	right: 0px;
+	width: 100%;
 }
 
 #logo {
@@ -50,7 +54,17 @@ body {
 }
 
 #menu li {
-	margin-left: 10px;
-	margin-right: 10px;
 	float: right;
+}
+
+#menu li a {
+	color: #606060;
+	width: 100px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+}
+
+#over {
+	height: 45px;
 }
