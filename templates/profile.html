@@ -1,4 +1,5 @@
 {% extends "home.html" %} {% block body %}
+<title>foRtReSS - Profile</title>
 <link rel=stylesheet type=text/css
 	href="{{ url_for('static', filename='styles/profile.css') }}">
 <div id="page">
@@ -32,9 +33,7 @@
 			</form>
 		</div>
 		<div id="avatar">
-			<p>
-				<img src="{{ url_for('static', filename='images/profile.png') }}">
-			</p>
+			<p><img src="{{ url_for('static', filename='images/profile.png') }}"></p>
 
 		</div>
 		<p id="btn-back">

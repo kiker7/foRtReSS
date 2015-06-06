@@ -42,9 +42,10 @@ body {
 }
 
 #logo a {
+	text-shadow: 2px 2px #202020;
 	text-decoration: none;
 	font-family: VVM;
-	color: black;
+	color: #c0c0c0;
 }
 
 #menu {
@@ -58,7 +59,7 @@ body {
 }
 
 #menu li a {
-	color: #606060;
+	color: #404040;
 	width: 100px;
 	text-align: center;
 	text-decoration: none;

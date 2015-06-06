@@ -1,8 +1,15 @@
 function start() {
-	$("#menu li a").hover(function() {
-		$(this).animate("fast", 1);
+	$(".anim").hover(function() {
+		$(this).animate({
+			backgroundColor: "#202020",
+			color : "#e0e0e0"
+		}, 100);
 	}, function() {
-		$(this).animate("fast", 0.70);
+		$(this).animate({
+			backgroundColor: "#ffffff",
+			color : "#404040"
+		}, 100);
 	});
+}
 
 $(document).ready(start);
