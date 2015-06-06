@@ -53,6 +53,7 @@ def create():
         if request.form['password'] != request.form['repassword']:
             error = "Different passwords"
         else:
+            # tutaj do request.form['password'] zhashowac 2 razy sha256 i wpisac poniżej
             g.db.execute('insert into users (username, password) values (?, ?)',
                  [request.form['username'], request.form['password']])
             g.db.commit()
@@ -82,7 +83,6 @@ def login():
                 flash('You were logged in')
                 return redirect(url_for('show_entries'))
     return render_template('login.html', error=error)
-
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
