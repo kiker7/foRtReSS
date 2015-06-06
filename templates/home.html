@@ -1,0 +1,33 @@
+<html>
+<head>
+<link rel=stylesheet type=text/css
+	href="{{ url_for('static', filename='styles/home.css') }}">
+<script type=text/javascript
+	src="{{ url_for('static', filename='scripts/jquery.min.js') }}"></script>
+<script type=text/javascript
+	src="{{ url_for('static', filename='scripts/jquery-ui.min.js') }}"></script>
+<title>foRtReSS - Home</title>
+</head>
+<body>
+	<div id=topbar>
+		<p id="logo">
+			<a href="{{ url_for('home') }}">foRtReSS</a>
+		</p>
+		<ul id="menu">
+		{% if not session.logged_in %}
+			<li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+			<li><a href="{{ url_for('signin') }}">Sign In</a></li>
+		{% else %}		
+			<li><a href="{{ url_for('signout') }}">Sign Out</a></li>
+			<li><a href="{{ url_for('profile') }}">My Profile</a></li>
+			{% if session.logged_user == "admin"%}
+				<li><a href="#">Manage Database</a></li>
+			{% endif %}
+			<li><a href="{{ url_for('home') }}">Home</a></li>
+		{% endif %}
+		</ul>
+	</div>
+	<div id="over"></div>
+	{% block body %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,70 @@
+{% extends "home.html" %} {% block body %}
+<link rel=stylesheet type=text/css
+	href="{{ url_for('static', filename='styles/profile.css') }}">
+<div id="page">
+	<p id="prof-title">Profile info</p>
+	<div>
+		<div id="info">
+			<form id="profile_info" method="post"
+				action="{{ url_for('update') }}">
+				<table>
+					<tr>
+						<td class="label">First Name:</td>
+						<td><input type="text" maxlength="20"></td>
+					</tr>
+					<tr>
+						<td class="label">Last Name:</td>
+						<td><input type="text" maxlength="20"></td>
+					</tr>
+					<tr>
+						<td class="label">E-mail:</td>
+						<td><input id="email" maxlength="20" type="text"></td>
+					</tr>
+					<tr>
+						<td class="label">Profile color:</td>
+						<td><input id="color" name="color" type="color"></td>
+					</tr>
+					<tr>
+						<td class="label">About:</td>
+						<td><textarea id="about" name="about" maxlength="120"></textarea></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div id="avatar">
+			<p>
+				<img src="{{ url_for('static', filename='images/profile.png') }}">
+			</p>
+
+		</div>
+		<p id="btn-back">
+			<input id="sub-btn" type="submit" value="Update Profile"
+				form="profile_info">
+		</p>
+	</div>
+	<p id="sec-title">Security</p>
+	<div id="security">
+		<p class="sec_info">If you want to change your password, fill the
+			fields listed below</p>
+		<form method="post" action="{{ url_for('changepass') }}">
+			<p>
+				<input class="passinput" name="old_pass" placeholder="Old password"
+					type="password">
+			</p>
+			<p>
+				<input class="passinput" name="new_pass" placeholder="New password"
+					type="password">
+			</p>
+			<p>
+				<input class="passinput" name="re_new_pass"
+					placeholder="Retype new password" type="password">
+			</p>
+			<p>
+				<input class="pass-sub-btn" type="submit" value="Change password">
+			</p>
+		</form>
+	</div>
+</div>
+<script type=text/javascript
+	src="{{ url_for('static', filename='scripts/profile.js') }}"></script>
+{% endblock %}
