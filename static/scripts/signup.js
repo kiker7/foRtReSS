@@ -1,9 +1,9 @@
 function start() {
 	$("#signup-btn").fadeTo(0, 0.70);
 	$("#signup-btn").hover(function() {
-		$(this).fadeTo("fast", 1);
+		$(this).fadeTo(100, 1);
 	}, function() {
-		$(this).fadeTo("fast", 0.70);
+		$(this).fadeTo(100, 0.70);
 	});
 }
 

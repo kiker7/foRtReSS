@@ -114,5 +114,17 @@ def update():
 def changepass():
     return redirect(url_for('profile'))
 
+@app.route('/database', methods=['GET'])
+def database():
+    cur = g.db.execute('select id, username, password from users order by id desc')
+    users = [dict(id=row[0], username=row[1], password=row[2]) for row in cur.fetchall()]
+    return render_template('database.html',users=users)
+
+@app.route('/delete', methods=['POST'])
+def delete():
+    g.db.execute('delete from users where id = ?',request.form['userid']) 
+    g.db.commit()
+    return redirect(url_for('database'))
+
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8000, debug=True, ssl_context=('certificate/server.crt', 'certificate/server.key'))
