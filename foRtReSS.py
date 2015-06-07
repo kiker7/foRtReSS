@@ -1,6 +1,7 @@
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from contextlib import closing
+from pass_check import hash_password, compare_password
 
 DATABASE = 'database/foRtReSS.db'
 SECRET_KEY = 'development.key'
@@ -66,7 +67,7 @@ def signin():
         if i > length:
             error = 'Invalid username'
         else:
-            if request.form['password'] != entries[i]['password']:
+            if not compare_password(request.form['password'], entries[i]['password']):
                 error = 'Invalid password'
             else:
                 session['logged_in'] = True
@@ -87,7 +88,7 @@ def signup():
             error = "Passwords does not match"
         else:
             g.db.execute('insert into users (username, password) values (?, ?)',
-                 [request.form['username'], request.form['password']])
+                 [request.form['username'], hash_password(request.form['password'])])
             g.db.commit()
             session['logged_in'] = True
             session['logged_user'] = request.form['username']
