@@ -1,5 +1,6 @@
-import hashlib, binascii, random, string, crypt
+import  random, string, crypt, math
 from hmac import compare_digest as compare_hash
+from collections import Counter
 
 
 def hash_password(password):
@@ -9,3 +10,10 @@ def hash_password(password):
 
 def compare_password(password, cryptedpasswd):
     return compare_hash(crypt.crypt(crypt.crypt(password, cryptedpasswd), cryptedpasswd), cryptedpasswd)
+
+def entropy(s):
+    g, lenght = Counter(s),float(len(s))
+    return -sum(zlicz/lenght * math.log(zlicz/lenght,2) for zlicz in g .values())
+
+def random_string():
+    return ''.join(random.choice(string.lowercase) for i in range(20))

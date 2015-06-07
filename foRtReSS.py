@@ -1,7 +1,7 @@
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from contextlib import closing
-from pass_check import hash_password, compare_password
+from pass_check import hash_password, compare_password, random_string
 
 DATABASE = 'database/foRtReSS.db'
 SECRET_KEY = 'development.key'
@@ -126,6 +126,25 @@ def delete():
     g.db.execute('delete from users where id = ?',request.form['userid']) 
     g.db.commit()
     return redirect(url_for('database'))
+
+# ochrona przed atakami csrf
+@app.before_request
+def csrf_protect():
+    if request.method == "POST":
+        token = session.pop('_csrf_token', None)
+        if not token or token != request.form.get('_csrf_token'):
+            abort(403)
+
+def generate_csrf_token():
+    if '_csrf_token' not in session:
+        session['_csrf_token'] = random_string()
+    return session['_csrf_token']
+
+app.jinja_env.globals['csrf_token'] = generate_csrf_token
+
+# TO DODAC DO FORMULARZA
+#     <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
+
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8000, debug=True, ssl_context=('certificate/server.crt', 'certificate/server.key'))
