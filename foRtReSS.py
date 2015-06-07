@@ -143,7 +143,7 @@ def generate_csrf_token():
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
 # TO DODAC DO FORMULARZA
-#     <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
+#  <input type=hidden name=_csrf_token value="{{ csrf_token() }}">
 
 
 if __name__ == '__main__':
