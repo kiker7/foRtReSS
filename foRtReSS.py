@@ -34,18 +34,17 @@ def home():
 
 @app.route('/forts')
 def forts():
-    cur = g.db.execute('select title, text from entries order by id desc')
-    entries = [dict(title=row[0], text=row[1]) for row in cur.fetchall()]
+    cur = g.db.execute('SELECT author, text from entries order by id desc')
+    entries = [dict(author=row[0], text=row[1]) for row in cur.fetchall()]
     return render_template('forts.html', entries=entries)
 
 @app.route('/addfort', methods=['POST'])
 def addfort():
     if not session.get('logged_in'):
         abort(401)
-    g.db.execute('insert into entries (title, text) values (?, ?)',
-                 [request.form['title'], request.form['text']])
+    g.db.execute('insert into entries (author, text) values (?, ?)',
+                 [session['logged_user'], request.form['text']])
     g.db.commit()
-    flash('New entry was successfully posted')
     return redirect(url_for('forts'))
     
 @app.route('/signin', methods=['GET', 'POST'])
@@ -71,7 +70,6 @@ def signin():
             else:
                 session['logged_in'] = True
                 session['logged_user'] = request.form['username']
-                flash('You were logged in')
                 return redirect(url_for('home'))
     return render_template('signin.html', error=error)
 
@@ -91,7 +89,6 @@ def signup():
             g.db.commit()
             session['logged_in'] = True
             session['logged_user'] = request.form['username']
-            flash('New account created')
             return redirect(url_for('home'))
     return render_template('signup.html', error=error)
 
@@ -118,11 +115,11 @@ def changepass():
 def database():
     cur = g.db.execute('select id, username, password from users order by id desc')
     users = [dict(id=row[0], username=row[1], password=row[2]) for row in cur.fetchall()]
-    return render_template('database.html',users=users)
+    return render_template('database.html', users=users)
 
 @app.route('/delete', methods=['POST'])
 def delete():
-    g.db.execute('delete from users where id = ?',request.form['userid']) 
+    g.db.execute('delete from users where id = ?', request.form['userid']) 
     g.db.commit()
     return redirect(url_for('database'))
 
