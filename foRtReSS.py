@@ -185,8 +185,8 @@ https://volt.iem.pw.edu.pl:8000/newpass?q=%s
 
 @app.route('/newpass', methods=['GET', 'POST'])
 def newpass():
-    print (reqest.args.get('q'))
-    url_for('/home')    
+    print (request.args.get('q'))
+    return home()
 
 @app.route('/profile')
 def profile(cherror=None, posinfo=None, error=None):
@@ -273,5 +273,5 @@ def generate_csrf_token():
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=8000, debug=True, ssl_context=('certificate/server.crt', 'certificate/server.key'))
+    app.run(host='194.29.146.3', port=8000, debug=True, ssl_context=('certificate/server.crt', 'certificate/server.key'))
 
