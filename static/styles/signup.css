@@ -27,13 +27,13 @@ body {
 	margin-bottom: 40px;
 	text-align: center;
 	font-size: 150px;
-	text-shadow: 5px 5px #202020;
+	text-shadow: 5px 5px 3px #202020;
 }
 
 #logo a, #logo a:hover, #logo a:visited, #logo a:active {
 	text-decoration: none;
 	font-family: VVM;
-	color: #c0c0c0;
+	color: rgba(208,208,208,0.8);
 }
 
 #signupbox {

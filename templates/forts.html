@@ -6,7 +6,7 @@
 	{% if session.logged_in %}
 	<div id="addfort">
 		<form action="{{ url_for('addfort') }}" method="post">
-			<div id="avat">{{ session.logged_user[0].upper() }}</div>
+			<div id="avat" style="background-color: {{ bgcolor[session.logged_user] }};color: {{ color[session.logged_user] }}">{{ session.logged_user[0].upper() }}</div>
 			<p>
 				<textarea id="fort" maxlength="150" name="text"
 					placeholder="Fort your thoughts..."></textarea>
@@ -20,10 +20,15 @@
 	<ul id="fortlist">
 		{% for entry in entries %}
 		<li><div id="fortitem">
-				<div id="avat">{{ entry.author[0].upper() }}</div>
-				<div id="login">{{ entry.author }}</div>
+				<div id="avat"
+					style="background-color: {{ bgcolor[entry.author] }};color: {{ color[entry.author] }}" >{{
+					entry.author[0].upper() }}</div>
+				<div id="login"><a href="{{ url_for('view',author=entry.author) }}">{{ entry.author }}</a></div>
 				<div id="content">{{ entry.text }}</div>
-			</div></li> {% endfor %}
+			</div></li> {% else %} {% if not session.logged_in %}
+		<div id="welcome">Welcome to</div>
+		<div id="titlefor">foRtReSS</div>
+		{% endif %} {% endfor %}
 	</ul>
 </div>
 <script type=text/javascript
