@@ -1,0 +1,17 @@
+<html>
+<head>
+<title>foRtReSS - Change Password</title>
+</head>
+<body>
+	<form action="{{ url_for('forgot') }}" method="post">
+		<input type=hidden name=_csrf_token value="{{ csrf_token() }}">
+		<p>
+			<input type="text" maxlength="10" placeholder="username"
+				name="username">
+		</p>
+		<p>
+			<input type="submit" value="Send">
+		</p>
+	</form>
+</body>
+</html>

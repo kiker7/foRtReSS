@@ -14,5 +14,6 @@ create table users (
 	surname text,
 	email text,
 	color text,
-	about text
+	about text,
+	ip text
 );

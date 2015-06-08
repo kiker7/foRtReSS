@@ -12,18 +12,21 @@
 		<td>Email</td>
 		<td>Color</td>
 		<td>About</td>
+		<td>List IP</td>
 	</tr>
 	{% for user in users %}
 	<tr>
 		<form action="delete" method="post">
-			<td><input type="number" value="{{ user.id }}" name="userid"></td>
-			<td><input type="text" value="{{ user.username }}"></td>
+			<input type=hidden name=_csrf_token value="{{ csrf_token() }}">
+			<td><input type="number" value="{{ user.id }}"></td>
+			<td><input type="text" value="{{ user.username }}" name="username"></td>
 			<td><input type="text" value="{{ user.password }}"></td>
 			<td><input type="text" value="{{ user.name }}"></td>
 			<td><input type="text" value="{{ user.surname }}"></td>
 			<td><input type="text" value="{{ user.email }}"></td>
 			<td><input type="text" value="{{ user.color }}"></td>
 			<td><input type="text" value="{{ user.about }}"></td>
+			<td><textarea>{{ user.ip }}</textarea></td>
 			<td><input type="submit" value="Delete User"></td>
 		</form>
 	</tr>

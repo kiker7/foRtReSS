@@ -6,6 +6,7 @@
 	{% if session.logged_in %}
 	<div id="addfort">
 		<form action="{{ url_for('addfort') }}" method="post">
+			<input type=hidden name=_csrf_token value="{{ csrf_token() }}">
 			<div id="avat" style="background-color: {{ bgcolor[session.logged_user] }};color: {{ color[session.logged_user] }}">{{ session.logged_user[0].upper() }}</div>
 			<p>
 				<textarea id="fort" maxlength="150" name="text"

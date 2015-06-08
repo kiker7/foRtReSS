@@ -1,12 +1,16 @@
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from contextlib import closing
+from pass_check import hash_password, compare_password, random_string
+import time
+from flask.ext.mail import Mail
 
 DATABASE = 'database/foRtReSS.db'
 SECRET_KEY = 'development.key'
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+mail = Mail(app)
 
 def connect_db():
     return sqlite3.connect(app.config['DATABASE'])
@@ -75,6 +79,7 @@ def addfort():
 def signin():
     error = None
     if request.method == 'POST':
+        session['login_count'] += 1
         cur = g.db.execute('SELECT username, password FROM users ORDER BY id DESC')
         entries = [dict(username=row[0], password=row[1]) for row in cur.fetchall()]
         length = len(entries)
@@ -85,69 +90,113 @@ def signin():
             except IndexError:
                 i += 1
                 break
-
-        if i > length:
+        if session['login_count'] == 3:
+            error = "Invalid login attempt. Please try later"
+        elif i > length:
             error = 'Invalid username'
         else:
-            if request.form['password'] != entries[i]['password']:
+            if not compare_password(request.form['password'], entries[i]['password']):
                 error = 'Invalid password'
             else:
                 session['logged_in'] = True
                 session['logged_user'] = request.form['username']
+                g.db.execute("UPDATE users SET ip=ip || ? || ' ' || ? || '\n' WHERE username=?", [request.environ['REMOTE_ADDR'], time.strftime("%c"), session['logged_user']])
+                g.db.commit()
                 return redirect(url_for('home'))
+    if 'login_count' not in session:
+        session['login_count'] = 0
     return render_template('signin.html', error=error)
+
+def user_exist(username):
+    exist = False
+    cur = g.db.execute('SELECT username FROM users ORDER BY id DESC')
+    registered = [dict(username=row[0]) for row in cur.fetchall()]
+    for i in range (0, len(registered)):
+        if registered[i]['username'] == username:
+            exist = True
+            break
+    return exist
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     error = None
     if request.method == 'POST':
-        exist = False
-        cur = g.db.execute('SELECT username FROM users ORDER BY id DESC')
-        registered = [dict(username=row[0]) for row in cur.fetchall()]
-        for i in range (0, len(registered)):
-            if registered[i]['username'] == request.form['username']:
-                exist = True
-                break
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        repassword = request.form['repassword']
         
-        if request.form['username'] == '':
-            error = "Empty username field"
-        elif request.form['password'] == '':
-            error = "Empty password field"
-        elif exist == True:
+        if username == "":
+            error = 'Empty username field'
+        elif username.isalnum() == False:
+            error = "Username contains illegal characters"
+        elif user_exist(username) == True:
             error = "Username already exist"
-        elif request.form['password'] != request.form['repassword']:
+        elif email == "":
+            error = "Empty email field"
+#         RegEx Emailu
+        elif password == "":
+            error = "Empty password field"
+        elif password != repassword:
             error = "Passwords does not match"
         else:
-            g.db.execute('INSERT INTO users (username, password, color) values (?, ?, ?)',
-                 [request.form['username'], request.form['password'], "#000000"])
+            g.db.execute("INSERT INTO users (username, password, email, color, ip) values (?, ?, ?, ?, ? || ' ' || ? || '\n')",
+                 [username, hash_password(password), email, '#000000', request.environ['REMOTE_ADDR'], time.strftime("%c")])
             g.db.commit()
             session['logged_in'] = True
-            session['logged_user'] = request.form['username']
+            session['logged_user'] = username
             return redirect(url_for('home'))
     return render_template('signup.html', error=error)
 
 @app.route('/signout')
 def signout():
+    session['login_count'] = 0
     session.pop('logged_in', None)
     session.pop('logged_user', None)
-    flash('You were logged out')
     return redirect(url_for('home'))
 
+@app.route('/forgot', methods=['GET', 'POST'])
+def forgot():
+    if request.method == 'POST':
+        username = request.form['username']
+        cur = g.db.execute('SELECT email FROM users WHERE username=?',[username])
+        email = cur.fetchall()
+        email = email[0][0]
+        msg = Message("Siema",sender="peper@interia.pl",recipients="piotr.pleban@interia.pl")
+        msg.body = "SIEMAAAA"
+        mail.send(msg)
+        return redirect(url_for('forgot'))
+    return render_template('forgot.html')
+
 @app.route('/profile')
-def profile(error=None):
+def profile(cherror=None, posinfo=None, error=None):
     cur = g.db.execute('SELECT name, surname, email, color, about FROM users WHERE username=?', [session['logged_user']])
     info = [dict(name=row[0], surname=row[1], email=row[2], color=row[3], about=row[4]) for row in cur.fetchall()]
-    return render_template('profile.html', info=info, error=error)
+    return render_template('profile.html', info=info, cherror=cherror, posinfo=posinfo, error=error)
 
 @app.route('/update', methods=['POST'])
 def update():
-    g.db.execute("UPDATE users SET name=?, surname=?, email=?, color=?, about=? WHERE username=?", [request.form['fname'], request.form['lname'], request.form['email'], request.form['color'], request.form['about'], session['logged_user']])
-    g.db.commit()
-    return redirect(url_for('profile'))
+    error = None
+    name = request.form['fname']
+    surname = request.form['lname']
+    email = request.form['email']
+    color = request.form['color']
+    about = request.form['about']
+    
+    if name.isalnum() == False:
+        error = "Illegal First Name"
+    elif surname.isalnum() == False:
+        error = "Illegal Last Name"
+#     Dopisac walidacje emaila lepsza i pola about
+    else:
+        g.db.execute("UPDATE users SET name=?, surname=?, email=?, color=?, about=? WHERE username=?", [name, surname, email, color, about, session['logged_user']])
+        g.db.commit()
+    return profile(error=error)
 
 @app.route('/changepass', methods=['POST'])
 def changepass():
     error = None
+    posinfo = None
     cur = g.db.execute('SELECT password FROM users WHERE username=?', [session['logged_user']])
     password = cur.fetchall()
     password = password[0][0]
@@ -155,24 +204,28 @@ def changepass():
     new_pass = request.form['new_pass']
     re_new_pass = request.form['re_new_pass']
     
-    if password != old_pass:
+    if old_pass == "" or new_pass == "" or re_new_pass == "":
+        error = "Empty field"
+    elif not compare_password(old_pass, password):
         error = "Wrong old password"
     elif new_pass != re_new_pass:
         error = "New password doesn't match"
     else:
-        g.db.execute("UPDATE users SET password=? WHERE username=?", [new_pass, session['logged_user']])
+        g.db.execute("UPDATE users SET password=? WHERE username=?", [hash_password(new_pass), session['logged_user']])
         g.db.commit()
-    return profile(error=error)
+        posinfo = "Password succesfully changed"
+    return profile(cherror=cherror, posinfo=posinfo)
 
 @app.route('/database', methods=['GET'])
 def database():
-    cur = g.db.execute('SELECT id, username, password, name, surname, email, color, about FROM users ORDER BY id DESC')
-    users = [dict(id=row[0], username=row[1], password=row[2], name=row[3], surname=row[4], email=row[5], color=row[6], about=row[7]) for row in cur.fetchall()]
+    cur = g.db.execute('SELECT id, username, password, name, surname, email, color, about, ip FROM users ORDER BY id DESC')
+    users = [dict(id=row[0], username=row[1], password=row[2], name=row[3], surname=row[4], email=row[5], color=row[6], about=row[7], ip=row[8]) for row in cur.fetchall()]
     return render_template('database.html', users=users)
 
 @app.route('/delete', methods=['POST'])
 def delete():
-    g.db.execute('DELETE FROM users WHERE id = ?', request.form['userid']) 
+    g.db.execute('DELETE FROM users WHERE username = ?', [request.form['username']])
+    g.db.execute('DELETE FROM entries WHERE author = ?', [request.form['username']])
     g.db.commit()
     return redirect(url_for('database'))
 
@@ -183,7 +236,21 @@ def view():
     info = [dict(name=row[0], surname=row[1], email=row[2], color=row[3], about=row[4]) for row in cur.fetchall()]
     dur = g.db.execute('SELECT text FROM entries WHERE author=?', [author])
     forts = [dict(entry=row[0]) for row in dur.fetchall()]
-    return render_template('view.html',info=info,forts=forts, author=author)
+    return render_template('view.html', info=info, forts=forts, author=author)
+
+@app.before_request
+def csrf_protect():
+    if request.method == "POST":
+        token = session.pop('_csrf_token', None)
+        if not token or token != request.form.get('_csrf_token'):
+            abort(403)
+
+def generate_csrf_token():
+    if '_csrf_token' not in session:
+        session['_csrf_token'] = random_string()
+    return session['_csrf_token']
+
+app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8000, debug=True, ssl_context=('certificate/server.crt', 'certificate/server.key'))

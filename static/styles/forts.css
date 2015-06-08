@@ -69,6 +69,10 @@
 	float: left;
 	line-height: 50px;
 	margin-left: 20px;
+}
+
+#login a {
+	text-decoration: none;
 	color: #1e63a5;
 }
 

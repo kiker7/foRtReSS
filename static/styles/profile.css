@@ -130,7 +130,7 @@ textarea {
 	padding: 5px;
 }
 
-#errorbox {
+#errorbox, #infobox {
 	position: relative;
 	width: 230px;
 	margin-left: 225px;
@@ -142,4 +142,8 @@ textarea {
 	padding-top: 3px;
 	padding-bottom: 3px;
 	margin-bottom: 10px;
+}
+
+#infobox {
+	background-color: #51ec4a;
 }

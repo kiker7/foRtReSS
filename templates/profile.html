@@ -9,9 +9,10 @@
 			<form id="profile_info" method="post"
 				action="{{ url_for('update') }}">
 				<table>
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 					<tr>
 						<td class="label">First Name:</td>
-						<td><input name="fname"type="text" maxlength="20" value="{{ info[0]['name'] }}"></td>
+						<td><input name="fname" type="text" maxlength="20" value="{{ info[0]['name'] }}"></td>
 					</tr>
 					<tr>
 						<td class="label">Last Name:</td>
@@ -23,7 +24,7 @@
 					</tr>
 					<tr>
 						<td class="label">Profile color:</td>
-						<td><input name="color" id="color" name="color" type="color" value="{{ info[0]['color'] }}"></td>
+						<td><input name="color" id="color" type="color" value="{{ info[0]['color'] }}"></td>
 					</tr>
 					<tr>
 						<td class="label">About:</td>
@@ -47,8 +48,10 @@
 	<div id="security">
 		<p class="sec_info">If you want to change your password, fill the
 			fields listed below</p>
-		<div style="height:20px;">{% if error %}<p id="errorbox">{{error}}</p>{% endif %}</div>
+		<div style="height:20px;">{% if cherror %}<p id="errorbox">{{ cherror }}</p>{% endif %}
+		{% if posinfo %}<p id="infobox">{{ posinfo }}</p>{% endif %}</div>
 		<form method="post" action="{{ url_for('changepass') }}">
+		<input type="hidden" name=_csrf_token value="{{ csrf_token() }}">
 			<p>
 				<input class="passinput" name="old_pass" placeholder="Old password"
 					type="password">
