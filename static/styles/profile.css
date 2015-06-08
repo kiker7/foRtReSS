@@ -1,6 +1,6 @@
 #page {
 	width: 700px;
-	height: 773px;
+	height: 793px;
 	margin-left: auto;
 	margin-right: auto;
 	margin-top: 50px;
@@ -13,8 +13,6 @@
 	font-size: 25px;
 	padding: 10px;
 }
-
-
 
 #prof-title {
 	border-bottom: 1px solid #808080;
@@ -130,4 +128,33 @@ textarea {
 	margin-right: 225px;
 	margin-bottom: 20px;
 	padding: 5px;
+}
+
+#cherrorbox, #infobox {
+	position: relative;
+	width: 230px;
+	margin-left: 225px;
+	margin-right: 225px;
+	font-size: 13px;
+	background-color: #ff1010;
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	margin-bottom: 10px;
+}
+
+#errorbox {
+	font-size: 13px;
+	background-color: #ff1010;
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	margin-bottom: 10px;
+	width: 350px;
+}
+
+#infobox {
+	background-color: #51ec4a;
 }

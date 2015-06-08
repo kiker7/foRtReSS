@@ -42,10 +42,10 @@ body {
 }
 
 #logo a {
-	text-shadow: 2px 2px #202020;
+	text-shadow: 2px 2px 1px #202020;
 	text-decoration: none;
 	font-family: VVM;
-	color: #c0c0c0;
+	color: rgba(208,208,208,0.8);
 }
 
 #menu {

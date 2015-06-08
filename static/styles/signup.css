@@ -27,13 +27,13 @@ body {
 	margin-bottom: 40px;
 	text-align: center;
 	font-size: 150px;
-	text-shadow: 5px 5px #202020;
+	text-shadow: 5px 5px 3px #202020;
 }
 
 #logo a, #logo a:hover, #logo a:visited, #logo a:active {
 	text-decoration: none;
 	font-family: VVM;
-	color: #c0c0c0;
+	color: rgba(208,208,208,0.8);
 }
 
 #signupbox {
@@ -68,7 +68,7 @@ body {
 	margin-bottom: 10px;
 }
 
-#username-fld, #password-fld, #repassword-fld, #signup-btn{
+#username-fld, #password-fld, #repassword-fld, #signup-btn, #email{
 	padding: 10px;
 	margin-left: 40px;
 	margin-right: 40px;
@@ -76,7 +76,7 @@ body {
 	margin-top: 10px;
 }
 
-#username-fld, #password-fld, #repassword-fld {	
+#username-fld, #password-fld, #repassword-fld, #email {	
 	background-color: #808080;
 	color: #c0c0c0;
 }
@@ -101,4 +101,8 @@ body {
 
 #back a:hover {
 	text-decoration: underline;
+}
+#strengh {
+	margin-left: 40px;
+	margin-right: 40px;
 }
