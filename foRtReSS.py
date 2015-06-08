@@ -3,14 +3,15 @@ from flask import Flask, request, session, g, redirect, url_for, abort, render_t
 from contextlib import closing
 from pass_check import hash_password, compare_password, random_string
 import time
-from flask.ext.mail import Mail
+import smtplib
 
 DATABASE = 'database/foRtReSS.db'
 SECRET_KEY = 'development.key'
+SERVER_MAIL = 'chevvson@gmail.com'
+SERVER_PASS = 'peper12345'
 
 app = Flask(__name__)
 app.config.from_object(__name__)
-mail = Mail(app)
 
 def connect_db():
     return sqlite3.connect(app.config['DATABASE'])
@@ -160,13 +161,32 @@ def forgot():
     if request.method == 'POST':
         username = request.form['username']
         cur = g.db.execute('SELECT email FROM users WHERE username=?',[username])
-        email = cur.fetchall()
-        email = email[0][0]
-        msg = Message("Siema",sender="peper@interia.pl",recipients="piotr.pleban@interia.pl")
-        msg.body = "SIEMAAAA"
-        mail.send(msg)
-        return redirect(url_for('forgot'))
+        email_to = cur.fetchall()
+        email_to = email_to[0][0]
+        
+        email_from = app.config['SERVER_MAIL']
+        email_pass = app.config['SERVER_PASS']
+        
+        session['secret_token'] = random_string()
+        msg = """foRtReSS Support Welcome!
+Click this link below to change your password:
+ 
+https://volt.iem.pw.edu.pl:8000/newpass?q=%s
+""" % (session['secret_token'])
+ 
+        server = smtplib.SMTP('smtp.gmail.com:587')
+        server.starttls()
+        server.login(email_from, email_pass)
+        server.sendmail(email_from, email_to, msg)
+        server.quit()
+        
+        return redirect(url_for('home'))
     return render_template('forgot.html')
+
+@app.route('/newpass', methods=['GET', 'POST'])
+def newpass():
+    print (reqest.args.get('q'))
+    url_for('/home')    
 
 @app.route('/profile')
 def profile(cherror=None, posinfo=None, error=None):
