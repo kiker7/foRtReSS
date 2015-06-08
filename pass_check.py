@@ -1,4 +1,4 @@
-import  random, string, crypt, math
+import random, string, crypt, math
 from hmac import compare_digest as compare_hash
 from collections import Counter
 
@@ -16,4 +16,4 @@ def entropy(s):
     return -sum(zlicz/lenght * math.log(zlicz/lenght,2) for zlicz in g .values())
 
 def random_string():
-    return ''.join(random.choice(string.lowercase) for i in range(20))
+    return ''.join(random.choice(string.ascii_letters) for i in range(20))

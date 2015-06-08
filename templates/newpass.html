@@ -1,0 +1,20 @@
+<html>
+<head>
+</head>
+<body>
+	{% if error %}<div>{{ error }}</div>{% endif %}
+	<form method="post" action="{{ url_for('newpass') }}">
+		<input type=hidden name=_csrf_token value="{{ csrf_token() }}">
+		<input type=hidden name=username value="{{ user }}">
+		<p>
+			Haslo:<input type="password" name='new_pass'>
+		</p>
+		<p>
+			Rehaslo:<input type="password" name='re_new_pass'>
+		</p>
+		<p>
+			<input type="submit">
+		</p>
+	</form>
+</body>
+</html>

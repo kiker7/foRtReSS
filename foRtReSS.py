@@ -4,6 +4,7 @@ from contextlib import closing
 from pass_check import hash_password, compare_password, random_string
 import time
 import smtplib
+import re
 
 DATABASE = 'database/foRtReSS.db'
 SECRET_KEY = 'development.key'
@@ -135,9 +136,12 @@ def signup():
             error = "Username already exist"
         elif email == "":
             error = "Empty email field"
-#         RegEx Emailu
+        elif not re.match(r"^[a-zA-Z0-9._-]+\@[a-zA-Z0-9._-]+\.[a-zA-Z]{2,}$", email):
+            error = "Invalid email address"
         elif password == "":
             error = "Empty password field"
+        elif len(password) < 5:
+            error = "Password too short. Minimum 6 characters"
         elif password != repassword:
             error = "Passwords does not match"
         else:
@@ -162,31 +166,56 @@ def forgot():
         username = request.form['username']
         cur = g.db.execute('SELECT email FROM users WHERE username=?',[username])
         email_to = cur.fetchall()
-        email_to = email_to[0][0]
+        
+        try:
+            email_to = email_to[0][0]
+        except IndexError:
+            error = "User not found"
+            return render_template('forgot.html',error=error)
         
         email_from = app.config['SERVER_MAIL']
         email_pass = app.config['SERVER_PASS']
-        
+         
         session['secret_token'] = random_string()
         msg = """foRtReSS Support Welcome!
-Click this link below to change your password:
- 
-https://volt.iem.pw.edu.pl:8000/newpass?q=%s
-""" % (session['secret_token'])
- 
+Rewrite this link into your browser to change your password:
+   
+https://127.0.0.1:8000/newpass?q=%s&u=%s
+""" % (session['secret_token'],username)
+   
         server = smtplib.SMTP('smtp.gmail.com:587')
         server.starttls()
         server.login(email_from, email_pass)
         server.sendmail(email_from, email_to, msg)
         server.quit()
-        
+          
         return redirect(url_for('home'))
     return render_template('forgot.html')
 
 @app.route('/newpass', methods=['GET', 'POST'])
 def newpass():
-    print (request.args.get('q'))
-    return home()
+    if request.method == 'POST':
+        user = request.form['username']
+        password = request.form['new_pass']
+        re_password = request.form['re_new_pass']
+        
+        if password == "":
+            error = "Empty password"
+            return render_template('newpass.html', user=user, error=error)
+        if password != re_password:
+            error = "Passwords does not match"
+            return render_template('newpass.html', user=user, error=error)
+        g.db.execute('UPDATE users SET password=? WHERE username=?',[hash_password(password),user])
+        g.db.commit()
+        session['logged_in'] = False
+        session['logged_user'] = ''
+        session['secret_token'] = ''
+        return home()
+    if request.args.get('q') == session['secret_token']:
+        user = request.args.get('u')
+        return render_template('newpass.html',user=user)
+    else:
+        return home()
 
 @app.route('/profile')
 def profile(cherror=None, posinfo=None, error=None):
@@ -203,11 +232,18 @@ def update():
     color = request.form['color']
     about = request.form['about']
     
+    
+    
     if name.isalnum() == False:
         error = "Illegal First Name"
     elif surname.isalnum() == False:
         error = "Illegal Last Name"
-#     Dopisac walidacje emaila lepsza i pola about
+    elif email == "":
+        error = "Empty email field"
+    elif not re.match(r"^[a-zA-Z0-9._-]+\@[a-zA-Z0-9._-]+\.[a-zA-Z]{2,}$", email):
+        error = "Invalid email address"
+    elif re.search(r"[<>=/\+\?\.\*\^\$\(\)\[\]\{\}\|\\]{1,}",about):
+        error = "Filed 'about' contains invalid characters"
     else:
         g.db.execute("UPDATE users SET name=?, surname=?, email=?, color=?, about=? WHERE username=?", [name, surname, email, color, about, session['logged_user']])
         g.db.commit()
@@ -215,7 +251,7 @@ def update():
 
 @app.route('/changepass', methods=['POST'])
 def changepass():
-    error = None
+    cherror = None
     posinfo = None
     cur = g.db.execute('SELECT password FROM users WHERE username=?', [session['logged_user']])
     password = cur.fetchall()
@@ -225,11 +261,13 @@ def changepass():
     re_new_pass = request.form['re_new_pass']
     
     if old_pass == "" or new_pass == "" or re_new_pass == "":
-        error = "Empty field"
+        cherror = "Empty field"
+    elif len(new_pass) < 5:
+        cherror = "Password too short"
     elif not compare_password(old_pass, password):
-        error = "Wrong old password"
+        cherror = "Wrong old password"
     elif new_pass != re_new_pass:
-        error = "New password doesn't match"
+        cherror = "New password doesn't match"
     else:
         g.db.execute("UPDATE users SET password=? WHERE username=?", [hash_password(new_pass), session['logged_user']])
         g.db.commit()
@@ -273,5 +311,4 @@ def generate_csrf_token():
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
 if __name__ == '__main__':
-    app.run(host='194.29.146.3', port=8000, debug=True, ssl_context=('certificate/server.crt', 'certificate/server.key'))
-
+    app.run(host='127.0.0.1', port=8000, debug=True, ssl_context=('certificate/server.crt', 'certificate/server.key'))

@@ -6,6 +6,7 @@
 	<p id="prof-title">Profile info</p>
 	<div>
 		<div id="info">
+			{% if error %}<div id="errorbox">{{ error }}</div>{% endif %}
 			<form id="profile_info" method="post"
 				action="{{ url_for('update') }}">
 				<table>
@@ -48,7 +49,7 @@
 	<div id="security">
 		<p class="sec_info">If you want to change your password, fill the
 			fields listed below</p>
-		<div style="height:20px;">{% if cherror %}<p id="errorbox">{{ cherror }}</p>{% endif %}
+		<div style="height:20px;">{% if cherror %}<p id="cherrorbox">{{ cherror }}</p>{% endif %}
 		{% if posinfo %}<p id="infobox">{{ posinfo }}</p>{% endif %}</div>
 		<form method="post" action="{{ url_for('changepass') }}">
 		<input type="hidden" name=_csrf_token value="{{ csrf_token() }}">
