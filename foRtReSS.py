@@ -181,7 +181,6 @@ def view():
     author = request.args.get('author')
     cur = g.db.execute('SELECT name, surname, email, color, about FROM users WHERE username=?', [author])
     info = [dict(name=row[0], surname=row[1], email=row[2], color=row[3], about=row[4]) for row in cur.fetchall()]
-    print info
     dur = g.db.execute('SELECT text FROM entries WHERE author=?', [author])
     forts = [dict(entry=row[0]) for row in dur.fetchall()]
     return render_template('view.html',info=info,forts=forts, author=author)
