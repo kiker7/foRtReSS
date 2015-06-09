@@ -42,7 +42,7 @@
 
 		</div>
 		<p id="btn-back">
-			<input id="sub-btn" type="submit" value="Update Profile"
+			<input class="submit-btn" type="submit" value="Update Profile"
 				form="profile_info">
 		</p>
 	</div>
@@ -67,11 +67,11 @@
 					placeholder="Retype new password" type="password">
 			</p>
 			<p>
-				<input class="pass-sub-btn" type="submit" value="Change password">
+				<input class="submit-btn" type="submit" value="Change password">
 			</p>
 		</form>
 	</div>
 </div>
 <script type=text/javascript
-	src="{{ url_for('static', filename='scripts/profile.js') }}"></script>
+	src="{{ url_for('static', filename='scripts/submit.js') }}"></script>
 {% endblock %}
