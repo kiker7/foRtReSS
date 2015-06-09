@@ -67,7 +67,7 @@ def forts(loginfo=None):
         bgcolor[crl['username']] = rgb_to_hex(d)
     cur = g.db.execute('SELECT author, text FROM entries ORDER BY id DESC')
     entries = [dict(author=row[0], text=row[1]) for row in cur.fetchall()]
-    return render_template('forts.html', entries=entries, color=color, bgcolor=bgcolor,loginfo=loginfo)
+    return render_template('forts.html', entries=entries, color=color, bgcolor=bgcolor, loginfo=loginfo)
 
 @app.route('/addfort', methods=['POST'])
 def addfort():
@@ -102,13 +102,14 @@ def signin():
             if not compare_password(request.form['password'], entries[i]['password']):
                 error = 'Invalid password'
             else:
+                loginfo = None
                 session['logged_in'] = True
                 session['logged_user'] = username
-                cur = g.db.execute('SELECT ip FROM users WHERE username=?',[username])
+                cur = g.db.execute('SELECT ip FROM users WHERE username=?', [username])
                 iplist = cur.fetchall()
                 iplist = iplist[0][0]
                 iplist = iplist.split("\n")
-                lastip = iplist[len(iplist)-2]
+                lastip = iplist[len(iplist) - 2]
                 lastip = lastip.split(" ")[0]
                 currentip = request.environ['REMOTE_ADDR']
                 if lastip != currentip:
