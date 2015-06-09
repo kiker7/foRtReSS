@@ -2,6 +2,7 @@
 <title>foRtReSS - Home</title>
 <link rel=stylesheet type=text/css
 	href="{{ url_for('static', filename='styles/forts.css') }}">
+{% if loginfo %}<div id="loginfo">{{ loginfo }}</div>{% endif %}
 <div id="page">
 	{% if session.logged_in %}
 	<div id="addfort">

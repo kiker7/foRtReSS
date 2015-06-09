@@ -44,11 +44,11 @@ def teardown_request(exception):
 
 @app.route('/')
 @app.route('/home')
-def home():
-    return forts()
+def home(loginfo=None):
+    return forts(loginfo)
 
 @app.route('/forts')
-def forts():
+def forts(loginfo=None):
     col_cur = g.db.execute('SELECT username, color FROM users ORDER BY id DESC')
     color_tmp = [dict(username=row[0], color=row[1]) for row in col_cur.fetchall()]
     color = {}
@@ -67,7 +67,7 @@ def forts():
         bgcolor[crl['username']] = rgb_to_hex(d)
     cur = g.db.execute('SELECT author, text FROM entries ORDER BY id DESC')
     entries = [dict(author=row[0], text=row[1]) for row in cur.fetchall()]
-    return render_template('forts.html', entries=entries, color=color, bgcolor=bgcolor)
+    return render_template('forts.html', entries=entries, color=color, bgcolor=bgcolor,loginfo=loginfo)
 
 @app.route('/addfort', methods=['POST'])
 def addfort():
@@ -112,16 +112,10 @@ def signin():
                 lastip = lastip.split(" ")[0]
                 currentip = request.environ['REMOTE_ADDR']
                 if lastip != currentip:
-                    cur = g.db.execute('SELECT email FROM users WHERE username=?', [username])
-                    email_to = cur.fetchall()
-                    email_to = email_to[0][0]
-                    msg="""foRtReSS Support
-You have been logged in on your account from new ip: %s
-                    """ % (currentip)
-                    send_mail(msg, email_to)
+                    loginfo = "You were logged from diferent ip"
                 g.db.execute("UPDATE users SET ip=ip || ? || ' ' || ? || '\n' WHERE username=?", [request.environ['REMOTE_ADDR'], time.strftime("%c"), session['logged_user']])
                 g.db.commit()
-                return redirect(url_for('home'))
+                return home(loginfo=loginfo)
     if 'login_count' not in session:
         session['login_count'] = 0
     return render_template('signin.html', error=error)
