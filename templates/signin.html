@@ -27,7 +27,7 @@
 				<a href="{{ url_for('forgot') }}">Forgot password?</a>
 			</p>
 			<p>
-				<input id="signin-btn" type="submit" value="Sign In">
+				<input class="submit-btn" type="submit" value="Sign In">
 			</p>
 			<p id="signup">
 				<a href="{{ url_for('signup') }}">Don't have an account? Sign Up</a>
@@ -35,6 +35,6 @@
 		</form>
 	</div>
 	<script type=text/javascript
-		src="{{ url_for('static', filename='scripts/signin.js') }}"></script>
+		src="{{ url_for('static', filename='scripts/submit.js') }}"></script>
 </body>
 </html>

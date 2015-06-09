@@ -13,10 +13,12 @@
 					placeholder="Fort your thoughts..."></textarea>
 			</p>
 			<p>
-				<input id="sub-btn" type="submit" value="Post">
+				<input class="submit-btn" type="submit" value="Post">
 			</p>
 		</form>
 	</div>
+	<script type=text/javascript
+	src="{{ url_for('static', filename='scripts/submit.js') }}"></script>
 	{% endif %}
 	<ul id="fortlist">
 		{% for entry in entries %}
@@ -32,6 +34,5 @@
 		{% endif %} {% endfor %}
 	</ul>
 </div>
-<script type=text/javascript
-	src="{{ url_for('static', filename='scripts/fort.js') }}"></script>
+
 {% endblock %}

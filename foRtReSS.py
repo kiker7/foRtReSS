@@ -5,6 +5,7 @@ from pass_check import hash_password, compare_password, random_string
 import time
 import smtplib
 import re
+import io
 
 DATABASE = 'database/foRtReSS.db'
 SECRET_KEY = 'development.key'
@@ -81,13 +82,14 @@ def addfort():
 def signin():
     error = None
     if request.method == 'POST':
+        username = request.form['username']
         session['login_count'] += 1
         cur = g.db.execute('SELECT username, password FROM users ORDER BY id DESC')
         entries = [dict(username=row[0], password=row[1]) for row in cur.fetchall()]
         length = len(entries)
         for i in range (0, length + 1):
             try:
-                if entries[i]['username'] == request.form['username']:
+                if entries[i]['username'] == username:
                     break
             except IndexError:
                 i += 1
@@ -101,7 +103,22 @@ def signin():
                 error = 'Invalid password'
             else:
                 session['logged_in'] = True
-                session['logged_user'] = request.form['username']
+                session['logged_user'] = username
+                cur = g.db.execute('SELECT ip FROM users WHERE username=?',[username])
+                iplist = cur.fetchall()
+                iplist = iplist[0][0]
+                iplist = iplist.split("\n")
+                lastip = iplist[len(iplist)-2]
+                lastip = lastip.split(" ")[0]
+                currentip = request.environ['REMOTE_ADDR']
+                if lastip != currentip:
+                    cur = g.db.execute('SELECT email FROM users WHERE username=?', [username])
+                    email_to = cur.fetchall()
+                    email_to = email_to[0][0]
+                    msg="""foRtReSS Support
+You have been logged in on your account from new ip: %s
+                    """ % (currentip)
+                    send_mail(msg, email_to)
                 g.db.execute("UPDATE users SET ip=ip || ? || ' ' || ? || '\n' WHERE username=?", [request.environ['REMOTE_ADDR'], time.strftime("%c"), session['logged_user']])
                 g.db.commit()
                 return redirect(url_for('home'))
@@ -160,6 +177,16 @@ def signout():
     session.pop('logged_user', None)
     return redirect(url_for('home'))
 
+def send_mail(msg, email_to):
+    email_from = app.config['SERVER_MAIL']
+    email_pass = app.config['SERVER_PASS']
+    
+    server = smtplib.SMTP('smtp.gmail.com:587')
+    server.starttls()
+    server.login(email_from, email_pass)
+    server.sendmail(email_from, email_to, msg)
+    server.quit()
+
 @app.route('/forgot', methods=['GET', 'POST'])
 def forgot():
     error = None;
@@ -173,9 +200,6 @@ def forgot():
         except IndexError:
             error = "User not found"
             return render_template('forgot.html', error=error)
-        
-        email_from = app.config['SERVER_MAIL']
-        email_pass = app.config['SERVER_PASS']
          
         session['secret_token'] = random_string()
         msg = """foRtReSS Support Welcome!
@@ -183,14 +207,9 @@ Rewrite this link into your browser to change your password:
    
 https://127.0.0.1:8000/newpass?q=%s&u=%s
 """ % (session['secret_token'], username)
-   
-        server = smtplib.SMTP('smtp.gmail.com:587')
-        server.starttls()
-        server.login(email_from, email_pass)
-        server.sendmail(email_from, email_to, msg)
-        server.quit()
+        send_mail(msg, email_to)
         error = "We have send you a uniqe email message. Please check your email box"
-    return render_template('forgot.html',error=error)
+    return render_template('forgot.html', error=error)
 
 @app.route('/newpass', methods=['GET', 'POST'])
 def newpass():
@@ -311,7 +330,7 @@ def generate_csrf_token():
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
 if __name__ == '__main__':
-#localhost
-#    app.run(host='127.0.0.1', port=8000, debug=True, ssl_context=('certificate/server.crt', 'certificate/server.key'))
-#volt
-    app.run(host='194.29.146.3', port=8000, debug=False, ssl_context=('certificate/server.crt', 'certificate/server.key'))
+# localhost
+    app.run(host='127.0.0.1', port=8000, debug=True, ssl_context=('certificate/server.crt', 'certificate/server.key'))
+# volt
+#    app.run(host='194.29.146.3', port=8000, debug=False, ssl_context=('certificate/server.crt', 'certificate/server.key'))

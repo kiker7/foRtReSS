@@ -81,7 +81,7 @@ textarea {
 	background-color: #ffffff;
 }
 
-#sub-btn {
+.submit-btn {
 	border-radius: 0px;
 	color: #202020;
 	padding-top: 5px;
@@ -117,17 +117,6 @@ textarea {
 	margin-left: 225px;
 	margin-right: 225px;
 	margin-top: 10px;
-}
-
-.pass-sub-btn {
-	background-color: #43c000;
-	color: #202020;
-	border-radius: 0px;
-	margin-top: 40px;
-	margin-left: 225px;
-	margin-right: 225px;
-	margin-bottom: 20px;
-	padding: 5px;
 }
 
 #cherrorbox, #infobox {

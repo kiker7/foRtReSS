@@ -68,7 +68,7 @@ body {
 	margin-bottom: 10px;
 }
 
-#username-fld, #password-fld, #signin-btn {
+#username-fld, #password-fld, .submit-btn {
 	padding: 10px;
 	margin-left: 40px;
 	margin-right: 40px;
@@ -78,7 +78,7 @@ body {
 	color: #c0c0c0;
 }
 
-#signin-btn {
+.submit-btn {
 	background-color: #3e86ff;
 	color: #202020;
 }
