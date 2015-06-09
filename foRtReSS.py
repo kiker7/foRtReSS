@@ -6,8 +6,6 @@ import time
 import smtplib
 import re
 
-
-
 DATABASE = 'database/foRtReSS.db'
 SECRET_KEY = 'development.key'
 SERVER_MAIL = 'chevvson@gmail.com'
@@ -313,12 +311,7 @@ def generate_csrf_token():
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
 if __name__ == '__main__':
-<<<<<<< HEAD
-<<<<<<< HEAD
-    app.run(host='194.29.146.3', port=8000, debug=True, ssl_context=('certificate/server.crt', 'certificate/server.key'))
-=======
-    app.run(host='127.0.0.1',port=8000)
->>>>>>> adres serwa/port
-=======
-    app.run(host='127.0.0.1',port=8000,debug = False/True,ssl_context=('certificates/server.crt', 'certificates/server.key'))
->>>>>>> zrobilem https
+#localhost
+#    app.run(host='127.0.0.1', port=8000, debug=True, ssl_context=('certificate/server.crt', 'certificate/server.key'))
+#volt
+    app.run(host='194.29.146.3', port=8000, debug=False, ssl_context=('certificate/server.crt', 'certificate/server.key'))
