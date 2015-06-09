@@ -72,8 +72,8 @@ def forts():
 def addfort():
     if not session.get('logged_in'):
         abort(401)
-    g.db.execute('INSERT INTO entries (author, text) VALUES (?, ?)',
-                 [session['logged_user'], request.form['text']])
+    g.db.execute('INSERT INTO entries (author, text, data) VALUES (?, ?, ?)',
+                 [session['logged_user'], request.form['text'], time.strftime("%c")])
     g.db.commit()
     return redirect(url_for('forts'))
     
@@ -162,16 +162,17 @@ def signout():
 
 @app.route('/forgot', methods=['GET', 'POST'])
 def forgot():
+    error = None;
     if request.method == 'POST':
         username = request.form['username']
-        cur = g.db.execute('SELECT email FROM users WHERE username=?',[username])
+        cur = g.db.execute('SELECT email FROM users WHERE username=?', [username])
         email_to = cur.fetchall()
         
         try:
             email_to = email_to[0][0]
         except IndexError:
             error = "User not found"
-            return render_template('forgot.html',error=error)
+            return render_template('forgot.html', error=error)
         
         email_from = app.config['SERVER_MAIL']
         email_pass = app.config['SERVER_PASS']
@@ -181,16 +182,15 @@ def forgot():
 Rewrite this link into your browser to change your password:
    
 https://127.0.0.1:8000/newpass?q=%s&u=%s
-""" % (session['secret_token'],username)
+""" % (session['secret_token'], username)
    
         server = smtplib.SMTP('smtp.gmail.com:587')
         server.starttls()
         server.login(email_from, email_pass)
         server.sendmail(email_from, email_to, msg)
         server.quit()
-          
-        return redirect(url_for('home'))
-    return render_template('forgot.html')
+        error = "We have send you a uniqe email message. Please check your email box"
+    return render_template('forgot.html',error=error)
 
 @app.route('/newpass', methods=['GET', 'POST'])
 def newpass():
@@ -205,7 +205,7 @@ def newpass():
         if password != re_password:
             error = "Passwords does not match"
             return render_template('newpass.html', user=user, error=error)
-        g.db.execute('UPDATE users SET password=? WHERE username=?',[hash_password(password),user])
+        g.db.execute('UPDATE users SET password=? WHERE username=?', [hash_password(password), user])
         g.db.commit()
         session['logged_in'] = False
         session['logged_user'] = ''
@@ -213,26 +213,25 @@ def newpass():
         return home()
     if request.args.get('q') == session['secret_token']:
         user = request.args.get('u')
-        return render_template('newpass.html',user=user)
+        return render_template('newpass.html', user=user)
     else:
         return home()
 
 @app.route('/profile')
-def profile(cherror=None, posinfo=None, error=None):
+def profile(cherror=None, posinfo=None, error=None, chinfo=None):
     cur = g.db.execute('SELECT name, surname, email, color, about FROM users WHERE username=?', [session['logged_user']])
     info = [dict(name=row[0], surname=row[1], email=row[2], color=row[3], about=row[4]) for row in cur.fetchall()]
-    return render_template('profile.html', info=info, cherror=cherror, posinfo=posinfo, error=error)
+    return render_template('profile.html', info=info, cherror=cherror, posinfo=posinfo, error=error, chinfo=chinfo)
 
 @app.route('/update', methods=['POST'])
 def update():
     error = None
+    chinfo = None
     name = request.form['fname']
     surname = request.form['lname']
     email = request.form['email']
     color = request.form['color']
     about = request.form['about']
-    
-    
     
     if name.isalnum() == False:
         error = "Illegal First Name"
@@ -242,12 +241,13 @@ def update():
         error = "Empty email field"
     elif not re.match(r"^[a-zA-Z0-9._-]+\@[a-zA-Z0-9._-]+\.[a-zA-Z]{2,}$", email):
         error = "Invalid email address"
-    elif re.search(r"[<>=/\+\?\.\*\^\$\(\)\[\]\{\}\|\\]{1,}",about):
+    elif re.search(r"[<>=/\+\?\.\*\^\$\(\)\[\]\{\}\|\\]{1,}", about):
         error = "Filed 'about' contains invalid characters"
     else:
+        chinfo = "Profile updated"
         g.db.execute("UPDATE users SET name=?, surname=?, email=?, color=?, about=? WHERE username=?", [name, surname, email, color, about, session['logged_user']])
         g.db.commit()
-    return profile(error=error)
+    return profile(error=error, chinfo=chinfo)
 
 @app.route('/changepass', methods=['POST'])
 def changepass():
@@ -292,8 +292,8 @@ def view():
     author = request.args.get('author')
     cur = g.db.execute('SELECT name, surname, email, color, about FROM users WHERE username=?', [author])
     info = [dict(name=row[0], surname=row[1], email=row[2], color=row[3], about=row[4]) for row in cur.fetchall()]
-    dur = g.db.execute('SELECT text FROM entries WHERE author=?', [author])
-    forts = [dict(entry=row[0]) for row in dur.fetchall()]
+    dur = g.db.execute('SELECT text, data FROM entries WHERE author=? ORDER BY id DESC', [author])
+    forts = [dict(entry=row[0], data=row[1]) for row in dur.fetchall()]
     return render_template('view.html', info=info, forts=forts, author=author)
 
 @app.before_request

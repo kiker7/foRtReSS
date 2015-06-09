@@ -1,6 +1,6 @@
 function getEntropy(chars, passwordLength) {
 	var charsLength = chars.length;
-	var entropyPerChar = Math.log(charsLength) / Math.log(2);
+	var entropyPerChar = Math.log2(charsLength);
 	var entropy = passwordLength * entropyPerChar;
 	return entropy;
 }
@@ -14,7 +14,7 @@ function start() {
 	});
 
 	$("#password-fld")
-			.keypress(
+			.keydown(
 					function() {
 						var pass = document.getElementById('password-fld').value;
 
@@ -27,9 +27,11 @@ function start() {
 							lower = true;
 						if (/[A-Z]/.test(pass))
 							upper = true;
-						if (/[0-9]/.test(pass))
+						if (/\d/.test(pass))
 							digits = true;
-
+						if (/[<>@!#\$%\^&\*\(\)_\+\[\]\{\}?:;\|'"\\,\.\/~`\-=]/.test(pass))
+							special = true;
+						
 						tab = new String();
 						if (lower == true)
 							tab += "abcdefghijklmnopqrstuvwxyz";
@@ -37,9 +39,11 @@ function start() {
 							tab += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 						if (digits == true)
 							tab += "0123456789";
-
+						if (special == true)
+							tab += "<>@!#$%^&*()_+[]{}?:;|'\"\\,./~`-=";
+						
 						var value = getEntropy(tab, pass.length);
-
+						
 						var strip = document.getElementById('strengh');
 						strip.innerHTML = "";
 						var str1 = document.createElement("div");
@@ -68,29 +72,16 @@ function start() {
 										"style",
 										"background-color: #00ff00; width:60px; height: 10px; float:left; margin-left: 2px; margin-right: 2px; margin-top:10px");
 
-						if (isNaN(value)){
-						} else if ( value < 15) {
+						if ( value > 0)
 							strip.appendChild(str1);
-						} else if (value < 30) {
-							strip.appendChild(str1);
+						if (value > 25)
 							strip.appendChild(str2);
-						} else if (value < 45) {
-							strip.appendChild(str1);
-							strip.appendChild(str2);
+						if (value > 50)
 							strip.appendChild(str3);
-						} else if (value < 60) {
-							strip.appendChild(str1);
-							strip.appendChild(str2);
-							strip.appendChild(str3);
+						if (value > 75)
 							strip.appendChild(str4);
-						} else {
-							strip.appendChild(str1);
-							strip.appendChild(str2);
-							strip.appendChild(str3);
-							strip.appendChild(str4);
+						if (value > 100)
 							strip.appendChild(str5);
-						}
-
 					});
 }
 

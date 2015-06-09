@@ -2,7 +2,8 @@ drop table if exists entries;
 create table entries (
     id integer primary key autoincrement,
     author text not null,
-    text text not null
+    text text not null,
+    data text
 );
 
 drop table if exists users;

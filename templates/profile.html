@@ -7,6 +7,7 @@
 	<div>
 		<div id="info">
 			{% if error %}<div id="errorbox">{{ error }}</div>{% endif %}
+			{% if chinfo %}<div id="posinfobox">{{ chinfo }}</div>{% endif %}
 			<form id="profile_info" method="post"
 				action="{{ url_for('update') }}">
 				<table>
