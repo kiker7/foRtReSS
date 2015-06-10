@@ -9,8 +9,8 @@ import io
 
 DATABASE = 'database/foRtReSS.db'
 SECRET_KEY = 'development.key'
-SERVER_MAIL = 'chevvson@gmail.com'
-SERVER_PASS = 'peper12345'
+SERVER_MAIL = 'rraf@spoko.pl'
+SERVER_PASS = 'Mahdi248'
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -79,6 +79,7 @@ def addfort():
     else:
         g.db.execute('INSERT INTO entries (author, text, data) VALUES (?, ?, ?)',
                  [session['logged_user'], text, time.strftime("%c")])
+        g.db.execute('INSERT INTO entries (author, text, data) VALUES (?, ?, ?)',[session['logged_user'], text, time.strftime("%c")])
         g.db.commit()
     return redirect(url_for('forts'))
 
@@ -103,7 +104,7 @@ def signin():
         elif i > length:
             error = 'Invalid username'
         else:
-            if not compare_password(request.form['password'], entries[i]['password']):
+            if not compare_password(bytes(request.form['password']), bytes(entries[i]['password'])):
                 error = 'Invalid password'
             else:
                 loginfo = None
@@ -180,7 +181,7 @@ def send_mail(msg, email_to):
     email_from = app.config['SERVER_MAIL']
     email_pass = app.config['SERVER_PASS']
     
-    server = smtplib.SMTP('smtp.gmail.com:587')
+    server = smtplib.SMTP('smtp.poczta.onet.pl:587')
     server.starttls()
     server.login(email_from, email_pass)
     server.sendmail(email_from, email_to, msg)
@@ -204,7 +205,7 @@ def forgot():
         msg = """foRtReSS Support Welcome!
 Rewrite this link into your browser to change your password:
    
-https://127.0.0.1:8000/newpass?q=%s&u=%s
+https://volt.iem.pw.edu.pl:8000/newpass?q=%s&u=%s
 """ % (session['secret_token'], username)
         send_mail(msg, email_to)
         error = "We have send you a uniqe email message. Please check your email box"
@@ -330,6 +331,6 @@ app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
 if __name__ == '__main__':
 # localhost
-    app.run(host='127.0.0.1', port=8000, debug=True, ssl_context=('certificate/server.crt', 'certificate/server.key'))
+#    app.run(host='127.0.0.1', port=8000, debug=True, ssl_context=('certificate/server.crt', 'certificate/server.key'))
 # volt
-#    app.run(host='194.29.146.3', port=8000, debug=False, ssl_context=('certificate/server.crt', 'certificate/server.key'))
+    app.run(host='194.29.146.3', port=8000, debug=True, ssl_context=('certificate/server.crt', 'certificate/server.key'))
