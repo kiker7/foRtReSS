@@ -73,11 +73,15 @@ def forts(loginfo=None):
 def addfort():
     if not session.get('logged_in'):
         abort(401)
-    g.db.execute('INSERT INTO entries (author, text, data) VALUES (?, ?, ?)',
-                 [session['logged_user'], request.form['text'], time.strftime("%c")])
-    g.db.commit()
+    text = request.form['text']
+    if re.search(r"[<>=/\+\?\.\*\^\$\(\)\[\]\{\}\|\\]{1,}", text):
+        error = "Filed 'about' contains invalid characters"
+    else:
+        g.db.execute('INSERT INTO entries (author, text, data) VALUES (?, ?, ?)',
+                 [session['logged_user'], text, time.strftime("%c")])
+        g.db.commit()
     return redirect(url_for('forts'))
-    
+
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
     error = None
