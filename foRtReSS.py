@@ -9,8 +9,8 @@ import io
 
 DATABASE = 'database/foRtReSS.db'
 SECRET_KEY = 'development.key'
-SERVER_MAIL = 'chevvson@gmail.com'
-SERVER_PASS = 'peper12345'
+SERVER_MAIL = 'rraf@spoko.pl'
+SERVER_PASS = 'Mahdi248'
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -73,9 +73,12 @@ def forts(loginfo=None):
 def addfort():
     if not session.get('logged_in'):
         abort(401)
-    g.db.execute('INSERT INTO entries (author, text, data) VALUES (?, ?, ?)',
-                 [session['logged_user'], request.form['text'], time.strftime("%c")])
-    g.db.commit()
+    text = request.form['text']
+    if re.search(r"[<>=/\+\?\.\*\^\$\(\)\[\]\{\}\|\\]{1,}", text):
+        error = "Filed 'about' contains invalid characters"
+    else:
+        g.db.execute('INSERT INTO entries (author, text, data) VALUES (?, ?, ?)',[session['logged_user'], text, time.strftime("%c")])
+        g.db.commit()
     return redirect(url_for('forts'))
     
 @app.route('/signin', methods=['GET', 'POST'])
@@ -176,7 +179,7 @@ def send_mail(msg, email_to):
     email_from = app.config['SERVER_MAIL']
     email_pass = app.config['SERVER_PASS']
     
-    server = smtplib.SMTP('smtp.gmail.com:587')
+    server = smtplib.SMTP('smtp.poczta.onet.pl:587')
     server.starttls()
     server.login(email_from, email_pass)
     server.sendmail(email_from, email_to, msg)
@@ -200,7 +203,7 @@ def forgot():
         msg = """foRtReSS Support Welcome!
 Rewrite this link into your browser to change your password:
    
-https://127.0.0.1:8000/newpass?q=%s&u=%s
+https://volt.iem.pw.edu.pl:8000/newpass?q=%s&u=%s
 """ % (session['secret_token'], username)
         send_mail(msg, email_to)
         error = "We have send you a uniqe email message. Please check your email box"
